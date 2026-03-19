@@ -12,8 +12,10 @@ class AuthController {
             $password = $_POST['password'];
 
             global $conn;
-            $query = "SELECT * FROM operators WHERE callsign = '" . $username . "' AND password = '" . $password . "'";
-            $result = mysqli_query($conn, $query);
+            $stmt = $conn->prepare("SELECT * FROM operators WHERE callsign = ? AND password = ?");
+            $stmt->bind_param("ss", $username, $password);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
             if (mysqli_num_rows($result) > 0) {
                 session_start();

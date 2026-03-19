@@ -16,6 +16,7 @@ class CoordinateHelper {
         $safeCoords = escapeshellarg($coords);
         
         // On exécute la commande avec l'argument sécurisé
+        // nosemgrep: php.lang.security.exec-use.exec-use
         exec("python3 /opt/navtools/dms2dec.py " . $safeCoords, $output);
         
         return implode("\n", $output);

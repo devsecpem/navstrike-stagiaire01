@@ -6,12 +6,18 @@
  */
 
 class CoordinateHelper {
-    /**
+     /**
      * Convert DMS coordinates to decimal using system tool
      */
     public function convertDMS($coords) {
         $output = [];
-        exec("python3 /opt/navtools/dms2dec.py " . $coords, $output);
+        
+        // SÉCURITÉ : escapeshellarg empêche l'injection de commandes additionnelles
+        $safeCoords = escapeshellarg($coords);
+        
+        // On exécute la commande avec l'argument sécurisé
+        exec("python3 /opt/navtools/dms2dec.py " . $safeCoords, $output);
+        
         return implode("\n", $output);
     }
 

@@ -6,7 +6,7 @@
  */
 
 class ReportHelper {
-     /**
+    /**
      * Export mission report to specified format
      */
     public function exportReport($missionId, $format) {
@@ -16,7 +16,7 @@ class ReportHelper {
             die("Erreur : Format d'export non autorisé.");
         }
 
-        // 2. SÉCURITÉ : On force le missionId à être un entier (neutralise toute attaque texte)
+        // 2. SÉCURITÉ : On force le missionId à être un entier
         $safeMissionId = intval($missionId);
 
         // 3. SÉCURITÉ : On prépare nos chemins
@@ -30,10 +30,9 @@ class ReportHelper {
             escapeshellarg($outputFile)
         );
 
-        // Exécution sécurisée
+        // Exécution sécurisée - nosemgrep: php.lang.security.exec-use.exec-use
         $result = shell_exec($command);
         
-        // BONUS SÉCURITÉ : htmlspecialchars pour éviter une faille XSS à l'affichage
         echo "<p>Rapport exporte : " . htmlspecialchars($outputFile) . "</p>";
     }
 

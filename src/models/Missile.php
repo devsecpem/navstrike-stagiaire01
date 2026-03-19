@@ -16,13 +16,18 @@ class Missile {
     }
 
     /**
-     * Find missiles by type (Exocet, Aster-15, Aster-30, SCALP)
+     * Find missiles by type
      */
     public function findByType() {
         global $conn;
-        $type = $_GET['type'];
-        $query = "SELECT * FROM missiles WHERE type = '" . $type . "' AND status = 'READY'";
-        return mysqli_query($conn, $query);
+        $type = $_GET['type'] ?? '';
+        
+        // SÉCURITÉ : Requête préparée
+        $stmt = $conn->prepare("SELECT * FROM missiles WHERE type = ? AND status = 'READY'");
+        $stmt->bind_param("s", $type);
+        $stmt->execute();
+        
+        return $stmt->get_result();
     }
 
     /**
@@ -30,10 +35,15 @@ class Missile {
      */
     public function updateStatus() {
         global $conn;
-        $missileId = $_POST['missile_id'];
-        $newStatus = $_POST['status'];
-        $query = "UPDATE missiles SET status = '" . $newStatus . "', updated_at = NOW() WHERE id = " . $missileId;
-        return mysqli_query($conn, $query);
+        $missileId = $_POST['missile_id'] ?? 0;
+        $newStatus = $_POST['status'] ?? '';
+        
+        // SÉCURITÉ : Requête préparée ("s" pour string status, "i" pour integer id)
+        $stmt = $conn->prepare("UPDATE missiles SET status = ?, updated_at = NOW() WHERE id = ?");
+        $stmt->bind_param("si", $newStatus, $missileId);
+        $stmt->execute();
+        
+        return $stmt->get_result();
     }
 
     /**

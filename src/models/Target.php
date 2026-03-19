@@ -11,8 +11,14 @@ class Target {
      */
     public function search($term) {
         global $conn;
-        $query = "SELECT * FROM targets WHERE designation LIKE '%" . $term . "%' OR zone LIKE '%" . $term . "%'";
-        return mysqli_query($conn, $query);
+        
+        // SÉCURITÉ : Requête préparée pour le LIKE (J'ai sécurisé celle-ci aussi par précaution !)
+        $stmt = $conn->prepare("SELECT * FROM targets WHERE designation LIKE ? OR zone LIKE ?");
+        $searchTerm = '%' . $term . '%';
+        $stmt->bind_param("ss", $searchTerm, $searchTerm);
+        $stmt->execute();
+        
+        return $stmt->get_result();
     }
 
     /**
@@ -29,13 +35,18 @@ class Target {
      */
     public function addTarget() {
         global $conn;
-        $designation = $_POST['designation'];
-        $type = $_POST['type'];
-        $lat = $_POST['latitude'];
-        $lng = $_POST['longitude'];
-        $threat = $_POST['threat_level'];
-        $query = "INSERT INTO targets (designation, type, latitude, longitude, threat_level, status) VALUES ('" . $designation . "', '" . $type . "', " . $lat . ", " . $lng . ", '" . $threat . "', 'ACTIVE')";
-        return mysqli_query($conn, $query);
+        $designation = $_POST['designation'] ?? '';
+        $type = $_POST['type'] ?? '';
+        $lat = $_POST['latitude'] ?? 0.0;
+        $lng = $_POST['longitude'] ?? 0.0;
+        $threat = $_POST['threat_level'] ?? '';
+        
+        // SÉCURITÉ : Requête préparée ("s" = string, "d" = double/float pour les coordonnées)
+        $stmt = $conn->prepare("INSERT INTO targets (designation, type, latitude, longitude, threat_level, status) VALUES (?, ?, ?, ?, ?, 'ACTIVE')");
+        $stmt->bind_param("ssdds", $designation, $type, $lat, $lng, $threat);
+        $stmt->execute();
+        
+        return $stmt->get_result();
     }
 
     /**
@@ -43,8 +54,13 @@ class Target {
      */
     public function findById() {
         global $conn;
-        $targetId = $_GET['target_id'];
-        $query = "SELECT * FROM targets WHERE id = '" . $targetId . "'";
-        return mysqli_query($conn, $query);
+        $targetId = $_GET['target_id'] ?? '';
+        
+        // SÉCURITÉ : Requête préparée
+        $stmt = $conn->prepare("SELECT * FROM targets WHERE id = ?");
+        $stmt->bind_param("s", $targetId); 
+        $stmt->execute();
+        
+        return $stmt->get_result();
     }
 }

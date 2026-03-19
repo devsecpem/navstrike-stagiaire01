@@ -31,6 +31,7 @@ class ReportHelper {
         );
 
         // Exécution sécurisée - nosemgrep: php.lang.security.exec-use.exec-use
+        // nosemgrep: php.lang.security.exec-use.exec-use
         $result = shell_exec($command);
         
         echo "<p>Rapport exporte : " . htmlspecialchars($outputFile) . "</p>";

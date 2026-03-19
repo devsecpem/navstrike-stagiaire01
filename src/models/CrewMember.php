@@ -30,17 +30,21 @@ class CrewMember {
         return $stmt->get_result();
     }
 
-    /**
+     /**
      * List crew with sorting
      */
     public function listCrew() {
         global $conn;
-        $sortBy = $_GET['sort'] ?? 'rank';
+        $sortInput = $_GET['sort'] ?? 'rank';
         
-        // SÉCURITÉ : Liste blanche car on ne peut pas préparer un ORDER BY
-        $allowedSortColumns = ['id', 'name', 'rank', 'role', 'station'];
-        if (!in_array($sortBy, $allowedSortColumns)) {
-            $sortBy = 'rank'; // Valeur par défaut si falsification
+        // SÉCURITÉ : Rupture totale de la chaîne de corruption.
+        // On n'insère JAMAIS l'entrée utilisateur. On assigne une valeur en dur.
+        switch ($sortInput) {
+            case 'id':      $sortBy = 'id'; break;
+            case 'name':    $sortBy = 'name'; break;
+            case 'role':    $sortBy = 'role'; break;
+            case 'station': $sortBy = 'station'; break;
+            default:        $sortBy = 'rank'; break;
         }
         
         $query = "SELECT * FROM crew ORDER BY " . $sortBy . " ASC";
